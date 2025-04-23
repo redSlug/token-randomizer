@@ -1,0 +1,10 @@
+tmp/
+venv/
+out/
+out_bg/
+ext/__pycache__/
+.idea/
+__pycache__/
+ext/
+.env
+frontend/node_modules/
