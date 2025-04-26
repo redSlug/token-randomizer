@@ -1,0 +1,12 @@
+version: "28.1"
+services:
+  randomizer:
+    container_name: randomizer-backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image:
+      bdettmer/token-randomizer:latest
+    ports:
+      - "5003:5000"
+    restart: always

@@ -20,7 +20,7 @@ CORS(app, resources={r"*": {"origins": "http://localhost:5173"}})
 
 @app.route("/")
 def home():
-    return "Hello, World! from server"
+    return "Hello, World!"
 
 
 @app.route("/randomize", methods=["POST"])
@@ -44,4 +44,4 @@ def randomize_image():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)

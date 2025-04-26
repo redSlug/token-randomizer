@@ -31,3 +31,21 @@ npm run dev
 
 - Backend: Flask, Python
 - Frontend: React, Vite
+
+## Backend local develoment
+
+### Docker
+
+```bash
+docker build -t local/token-randomizer .
+docker run -p 5009:5000 --name randomizer local/token-randomizer
+docker stop randomizer
+docker rm randomizer
+```
+
+### Docker compose
+
+```bash
+docker compose build
+docker compose up -d --force-recreate
+```
