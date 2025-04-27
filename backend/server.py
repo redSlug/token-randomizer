@@ -8,19 +8,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__)
-# cors = CORS(app, resources={
-#     r"/randomize": {
-#         "origins": ["localhost:5173", "http://127.0.0.1:5173"],
-#         "methods": ["POST"],
-#         "allow_headers": ["Content-Type"]
-#     }
-# })
+CORS(app, resources={
+    r"*": {
+        "origins": ["localhost:5173", "http://127.0.0.1:5173"],
+        "methods": ["POST", "GET"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 CORS(app, resources={r"*": {"origins": "http://localhost:5173"}})
 
 
 @app.route("/")
 def home():
-    return "Hello, World!"
+    return "Hello, World"
 
 
 @app.route("/randomize", methods=["POST"])
@@ -44,4 +44,4 @@ def randomize_image():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port='5000', debug=True)

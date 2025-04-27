@@ -8,6 +8,7 @@ dotenv==0.9.9
 Flask==3.1.0
 flask-cors==5.0.1
 flatbuffers==25.2.10
+gunicorn==23.0.0
 humanfriendly==10.0
 idna==3.10
 imageio==2.37.0

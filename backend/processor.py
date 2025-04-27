@@ -47,7 +47,7 @@ def pick_random(directory):
 
 
 def process_image(image_path):
-    print("processing imageZZZZ", image_path)
+    print("processing image", image_path)
     input_basename = os.path.basename(image_path)
     print("input_basename", input_basename)
     input_name_part, _ = os.path.splitext(input_basename)
