@@ -27,15 +27,13 @@ jobs:
           push: true
           tags: bdettmer/token-randomizer:latest
           platforms: linux/amd64
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
       - name: Deploy image
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1
         with:
-          host: ${{vars.SERVER_HOST}}
-          username: ${{vars.SERVER_USERNAME}}
-          key: ${{secrets.SERVER_KEY}}
-          port: ${{vars.SERVER_PORT}}
+          host: ${{ vars.SERVER_HOST }}
+          username: ${{vars.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_KEY }}
+          port: ${{ vars.SERVER_PORT }}
           script: |
             sudo docker pull bdettmer/token-randomizer:latest
             sudo docker stop randomizer-backend
