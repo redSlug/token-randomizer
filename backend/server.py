@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__)
-CORS(app, resources={r"*": {"origins": ["http://localhost:5173", "https://redslug.github.io/token-randomizer/"]}})
+CORS(app, resources={r"*": {"origins": ["http://localhost:5173", "https://redslug.github.io"]}})
 
 
 @app.route("/")
