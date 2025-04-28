@@ -20,7 +20,7 @@ CORS(app, resources={r"*": {"origins": "http://localhost:5173"}})
 
 @app.route("/")
 def home():
-    return "Hello, World faster"
+    return "Hello, World faster!"
 
 
 @app.route("/randomize", methods=["POST"])
