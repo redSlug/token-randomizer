@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy Frontend
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     env:
-      VITE_API_URL: ${{ var.VITE_API_URL }}
+      VITE_API_URL: ${{ vars.VITE_API_URL }}
     defaults:
       run:
         working-directory: ./frontend
@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           name: github-pages
-          path: ./dist
+          path: ./frontend/dist
 
   deploy:
     name: Deploy

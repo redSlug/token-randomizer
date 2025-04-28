@@ -38,7 +38,7 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Token Randomizer</h1>
+      <h1>Token Randomizer app</h1>
       <div className="upload-section">
         <input
           type="file"
