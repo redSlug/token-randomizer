@@ -1,13 +1,7 @@
 FROM python:3.11-slim
-
 WORKDIR /token-randomizer/backend
-
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6 curl -y
-
 COPY requirements.txt .
-
 RUN pip install -r requirements.txt
-
 COPY . .
-
-CMD ["gunicorn", "--bind", "0.0.0.0:3000", "--timeout", "120", "-w", "2", "server:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--timeout", "120", "-w", "2", "server:app"]
