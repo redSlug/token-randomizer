@@ -8,6 +8,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__)
+
+# Set maximum content length to 16MB (adjust as needed)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
 CORS(app, resources={r"*": {"origins": ["http://localhost:5173", "https://redslug.github.io"]}})
 
 
