@@ -19,13 +19,15 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
+      - name: Build and push Docker image
         id: docker_build
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}:backend"
           push: true
           tags: ${{ vars.DOCKERHUB_IMAGE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           platforms: linux/amd64
       - name: Deploy image
         uses: appleboy/ssh-action@v1
