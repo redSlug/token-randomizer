@@ -26,9 +26,9 @@ jobs:
           context: "{{defaultContext}}:backend"
           push: true
           tags: ${{ vars.DOCKERHUB_IMAGE }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           platforms: linux/amd64
+          cache-from: type=registry,ref=bdettmer/token-randomizer:buildcache
+          cache-to: type=registry,ref=bdettmer/token-randomizer:buildcache,mode=max
       - name: Deploy image
         uses: appleboy/ssh-action@v1
         with:
