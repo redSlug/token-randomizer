@@ -1,6 +1,16 @@
-# coin selector
+# Backend
 
+## nginx example
 ```bash
-python3 main.py --input_image tmp/coins1.JPG --pick
+cat /etc/nginx/sites-enabled/token-randomizer
 
+server {
+    listen		89;
+
+    server_name		_;
+
+    location / {
+			proxy_pass http://127.0.0.1:5003/;
+    }
+}
 ```

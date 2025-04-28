@@ -41,4 +41,4 @@ jobs:
             sudo docker stop randomizer-backend
             sudo docker rm randomizer-backend
             docker image prune -a --force
-            sudo docker run -d --restart on-failure --name=randomizer-backend --platform linux/amd64 -p 5003:3000 ${{ vars.DOCKERHUB_IMAGE }}
+            sudo docker run -d --restart on-failure --name=randomizer-backend --platform linux/amd64 -p 5003:5000 ${{ vars.DOCKERHUB_IMAGE }}
