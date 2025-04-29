@@ -1,4 +1,5 @@
-from rembg import remove
+from rembg import remove, new_session
+
 from PIL import Image
 import sys
 import os
@@ -15,10 +16,13 @@ def remove_background(input_path, output_path):
         if output_dir:
             os.makedirs(output_dir, exist_ok=True)
 
+        my_session = new_session("u2netp") # use lightweight model
+
         output_image = remove(
             input_image,
             alpha_matting=True,
             alpha_matting_foreground_threshold=2,
+            session=my_session
         )
         # Ensure output is RGBA to handle transparency
         if output_image.mode != "RGBA":

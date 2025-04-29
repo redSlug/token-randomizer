@@ -1,57 +1,27 @@
 import argparse
-import glob
 import os
-import random
-import sys
+import shutil
 
-import cv2
-
+from memory import MemoryMonitor
 from background import remove_background
-from extract import extract_objects_connected
+from extract import draw_bounding_box
+from resize import resize_jpg
+from display import display_image  ## only for debugging
 
 
 MIN_TRANSPARENCY_PERCENT = 5.0
 
 
-def display_image(window_name, image_path):
-    """Loads and displays an image using OpenCV."""
-    img = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-    if img is None:
-        print(f"Error: Could not load image for display: {image_path}", file=sys.stderr)
-        return
-    cv2.imshow(window_name, img)
-    print(f"Displaying: {image_path}. Press any key to close.")
-    cv2.waitKey(0)
-    cv2.destroyWindow(window_name)
-
-
-def pick_and_show_random(directory):
-    random_file = pick_random(directory)
-    display_image(f"Random Pick from {os.path.basename(directory)}", random_file)
-    return True
-
-
-def pick_random(directory):
-    """Picks a random PNG from the directory and displays it."""
-    png_files = glob.glob(os.path.join(directory, "*.png"))
-    if not png_files:
-        print(
-            f"No PNG files found in directory '{directory}' to pick from.",
-            file=sys.stderr,
-        )
-        return False
-
-    random_file = random.choice(png_files)
-    print(f"Randomly selected: {os.path.basename(random_file)}")
-    return random_file
-
-
 def process_image(image_path):
+
     print("processing image", image_path)
+    resize_jpg(image_path, image_path, 750)
+
     input_basename = os.path.basename(image_path)
     print("input_basename", input_basename)
     input_name_part, _ = os.path.splitext(input_basename)
     print("input_name_part", input_name_part)
+
     bg_removed_dir = "out_bg"
     bg_removed_filename = f"{input_name_part}.png"  # Force PNG
     bg_removed_path = os.path.join(bg_removed_dir, bg_removed_filename)
@@ -60,15 +30,30 @@ def process_image(image_path):
     # 2. Extracted Objects Directory Path
     # The extract script creates the final dir, so we just define the base here
     extracted_obj_base_dir = "tmp/ext"
-    extracted_obj_dir = os.path.join(
-        extracted_obj_base_dir, input_name_part
-    )  # e.g., ext/coins1
+    extracted_obj_dir = os.path.join(extracted_obj_base_dir, input_name_part)  # e.g., ext/coins1
+    target_file = os.path.join(extracted_obj_dir, "output.png")  # e.g., ext/coins1/output.png
+
+    # Clean up: not needed for 1 users, but may be needed in the future
+    # if os.path.exists(extracted_obj_dir):
+    #     shutil.rmtree(extracted_obj_dir)
+    # os.makedirs(os.path.dirname(target_file), exist_ok=True)     # Make sure the parent directories exist
+
+    monitor = MemoryMonitor()
+    monitor.start()
 
     # The extract script should handle creating this directory if needed
     print("removing background", image_path, bg_removed_path)
     remove_background(image_path, bg_removed_path)
-    extract_objects_connected(bg_removed_path, extracted_obj_dir)
-    return pick_random(extracted_obj_dir)
+
+    print("drawing boxes", bg_removed_path, image_path, target_file)
+    draw_bounding_box(bg_removed_path, image_path, target_file)
+
+    # display_image('output_png', target_file)
+
+    peak = monitor.stop()
+    print(f"Peak memory usage: {peak / 1024**2:.2f} MB")
+
+    return target_file
 
 
 if __name__ == "__main__":
@@ -83,4 +68,4 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    process_image(input_name_part)
+    process_image(args.input_image)

@@ -1,91 +1,103 @@
 import cv2
 import numpy as np
-from PIL import Image
 import os
 import sys
 import argparse
+import random
 
 
-def extract_objects_connected(input_path, output_dir):
-    try:
-        os.makedirs(output_dir, exist_ok=True)
-    except Exception as e:
-        print(f"Error creating output directory: {e}")
+def draw_bounding_box(input_path, orig_path, output_path, min_area=100):
+    # Read RGB image for object detection
+    img_for_detection = cv2.imread(input_path, cv2.IMREAD_UNCHANGED)
+    if img_for_detection is None:
+        print(f"Error: Could not read detection image {input_path}", file=sys.stderr)
+        return False
 
-    img = cv2.imread(input_path, cv2.IMREAD_UNCHANGED)
-    if img.shape[2] < 4:
-        raise ValueError("Image has no transparency channel; it's not really png")
+    # Read the original image to draw on
+    img_to_draw_on = cv2.imread(orig_path, cv2.IMREAD_UNCHANGED) # Read with alpha if present
+    if img_to_draw_on is None:
+        print(f"Error: Could not read original image {orig_path}", file=sys.stderr)
+        return False
 
-    alpha = img[:, :, 3]
+    # Prepare image for drawing: Needs to handle different formats
+    draw_on_has_alpha = False
+    if len(img_to_draw_on.shape) == 3 and img_to_draw_on.shape[2] == 4:    # Already BGRA, good to go
+        draw_on_has_alpha = True
+    elif len(img_to_draw_on.shape) == 3 and img_to_draw_on.shape[2] == 3:  # Is BGR, good to go
+        pass
 
-    # Threshold the alpha channel to binary mask
+    # Threshold the alpha channel
+    alpha = img_for_detection[:, :, 3]
     _, binary_mask = cv2.threshold(alpha, 10, 255, cv2.THRESH_BINARY)
-
-    # Remove noise by morphological operations (optional but helpful)
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-    cleaned_mask = cv2.morphologyEx(binary_mask, cv2.MORPH_OPEN, kernel, iterations=2)
 
     # Find connected components
     num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(
-        cleaned_mask, connectivity=8
+        binary_mask, connectivity=8
     )
 
-    print(f"Found {num_labels - 1} objects.")  # label 0 is background
+    print(f"Found {num_labels - 1} potential objects in {os.path.basename(input_path)}.")
 
-    for label in range(1, num_labels):  # Skip background
+    # Collect valid boxes and select one randomly
+    valid_boxes = []
+    for label in range(1, num_labels): # Skip background (label 0)
         x, y, w, h, area = stats[label]
+        if area >= min_area:
+            valid_boxes.append((x, y, w, h)) # Store coordinates directly
 
-        # Skip very small areas (e.g., noise that survived cleaning)
-        if area < 100:
-            print(f"Skipping object {label} with area {area} pixels.")
-            continue
+    if not valid_boxes:
+        print(f"No objects found meeting the minimum area requirement ({min_area} pixels).")
+    else:
+        print(f"Found {len(valid_boxes)} objects meeting the area criteria.")
+        # Select one box randomly
+        selected_box = random.choice(valid_boxes)
+        x, y, w, h = selected_box
 
-        # Mask for current component
-        component_mask = (labels == label).astype(np.uint8) * 255
-        object_alpha = cv2.bitwise_and(alpha, alpha, mask=component_mask)
-        object_rgb = cv2.bitwise_and(img[:, :, :3], img[:, :, :3], mask=component_mask)
+        # Draw the selected rectangle on the img_to_draw_on
+        color = (0, 0, 255, 255) if draw_on_has_alpha else (0, 0, 255)
+        cv2.rectangle(img_to_draw_on, (x, y), (x + w, y + h), color, 2)
+        print(f"Drew 1 randomly selected bounding box onto {os.path.basename(orig_path)}.")
 
-        # Combine RGB and alpha
-        object_rgba = cv2.merge((object_rgb, object_alpha))
-
-        # Crop to bounding box
-        cropped = cv2.cvtColor(object_rgba[y : y + h, x : x + w], cv2.COLOR_BGRA2RGBA)
-
-        # Save with PIL
-        output_path = os.path.join(output_dir, f"object_{label}.png")
-        Image.fromarray(cropped).save(output_path)
-        print(f"Saved: {output_path}")
-
-    return True
+    # Save the modified (or original if no box drawn) drawing image
+    try:
+        cv2.imwrite(output_path, img_to_draw_on)
+        print(f"Saved final image to: {output_path}")
+        return True
+    except Exception as e:
+        print(f"Error saving output image: {e}", file=sys.stderr)
+        return False
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Extract objects from a PNG based on transparency, filtering noise."
+        description="Detect objects based on alpha channel of an input image and draw bounding boxes onto a separate original image."
     )
     parser.add_argument(
-        "input_png", help="Path to the input PNG file (with transparency)."
+        "input_png", help="Path to the input image file (e.g., PNG with alpha) used for object detection."
     )
     parser.add_argument(
-        "output_dir", help="Directory to save the extracted object PNG files."
+        "original_image", help="Path to the original image file (e.g., JPG, PNG) onto which boxes will be drawn."
     )
     parser.add_argument(
-        "-min",
-        "--min-area",
+        "output_file", help="Path to save the output image (original_image with boxes drawn)."
+    )
+    parser.add_argument(
+        "min-area",
         type=int,
         default=100,
-        help="Minimum contour area to consider an object (default: 100 pixels).",
+        help="Minimum object area (from input_image) to draw a box around (default: 100 pixels).",
     )
 
     args = parser.parse_args()
 
+    # Basic checks if inputs exist
     if not args.input_png.lower().endswith(".png"):
-        print(
-            f"Warning: Input file '{args.input_png}' should be a PNG file, preferably with transparency.",
-            file=sys.stderr,
-        )
+        print(f"Warning: Input file '{args.input_png}' should be a PNG file, preferably with transparency.", file=sys.stderr)
+        sys.exit(1)
+    if not os.path.exists(args.original_image):
+        print(f"Error: Original image file not found at {args.original_image}", file=sys.stderr)
+        sys.exit(1)
 
-    success = extract_objects_connected(args.input_png, args.output_dir)
+    success = draw_bounding_box(args.input_png, args.original_image, args.output_file, args.min_area)
 
     if not success:
         sys.exit(1)
