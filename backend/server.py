@@ -25,13 +25,15 @@ def randomize_image():
     if "image" not in request.files:
         return "No image uploaded", 400
     image_file = request.files["image"]
+    desired_token_count = int(request.form["randomTokenCount"])
+    print("desired token count", desired_token_count)
     image = Image.open(image_file.stream)
 
     os.makedirs("/tmp/input/", exist_ok=True)
     filename = "uploaded_image.png"
     save_path = os.path.join("/tmp/input/", filename)
     image.save(save_path)
-    result = process_image(save_path)
+    result = process_image(save_path, desired_token_count)
 
     updated_image = Image.open(result)
     img_io = io.BytesIO()

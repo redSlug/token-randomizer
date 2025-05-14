@@ -6,7 +6,8 @@ import argparse
 import random
 
 
-def draw_bounding_box(input_path, orig_path, output_path, min_area=100):
+
+def draw_bounding_box(input_path, orig_path, output_path, desired_token_count, min_area=100):
     # Read RGB image for object detection
     img_for_detection = cv2.imread(input_path, cv2.IMREAD_UNCHANGED)
     if img_for_detection is None:
@@ -51,20 +52,24 @@ def draw_bounding_box(input_path, orig_path, output_path, min_area=100):
 
             valid_boxes.append((x, y, w, h)) # Store coordinates directly
 
+
+
     if not valid_boxes:
         print(f"No objects found meeting the minimum area requirement ({min_area} pixels).")
     else:
         print(f"Found {len(valid_boxes)} objects meeting the area criteria.")
-        # Select one box randomly
-        selected_box = random.choice(valid_boxes)
-        x, y, w, h = selected_box
+        # Select tokens randomly
+        random_integers = random.sample(range(0, len(valid_boxes)), desired_token_count)
 
-        # Draw the selected circle on the img_to_draw_on
-        color = (0, 255, 255, 255) if draw_on_has_alpha else (255, 255, 255) # Changed BGR color to white for selected, was (0,0,255) red
-        center = (x + w // 2, y + h // 2)
-        radius = min(w // 2, h // 2)
-        cv2.circle(img_to_draw_on, center, radius, color, 2)
-        print(f"Drew 1 randomly selected bounding circle onto {os.path.basename(orig_path)}.")
+
+        for random_index in random_integers:
+            x, y, w, h = valid_boxes[random_index]
+            # Draw the selected tokens on the img_to_draw_on
+            color = (0, 255, 255, 255) if draw_on_has_alpha else (255, 255, 255) # Changed BGR color to white for selected, was (0,0,255) red
+            center = (x + w // 2, y + h // 2)
+            radius = min(w // 2, h // 2)
+            cv2.circle(img_to_draw_on, center, radius, color, 2)
+            print(f"Drew randomly selected bounding circles onto {os.path.basename(orig_path)}.")
 
     # Save the modified (or original if no box drawn) drawing image
     try:

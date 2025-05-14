@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import './App.css'
+import IntegerInput from "./IntegerInput.jsx";
 
 function App() {
   const [image, setImage] = useState(null)
   const [randomizedImage, setRandomizedImage] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [tokenCount, setTokenCount] = useState(1)
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0]
@@ -21,6 +23,7 @@ function App() {
     const response = await fetch(image)
     const blob = await response.blob()
     formData.append('image', blob)
+    formData.append('randomTokenCount', tokenCount)
 
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/randomize`, {
@@ -51,8 +54,9 @@ function App() {
           </button>
         )}
       </div>
+      <IntegerInput onChange={setTokenCount} defaultValue={tokenCount}/>
       <div className="image-container">
-        {image && (
+        {image && !randomizedImage && (
           <div className="image-wrapper">
             <h2>Original Tokens</h2>
             <img src={image} alt="Original" />
@@ -69,4 +73,4 @@ function App() {
   )
 }
 
-export default App 
+export default App

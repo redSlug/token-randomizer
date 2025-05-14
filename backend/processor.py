@@ -12,7 +12,7 @@ from display import display_image  ## only for debugging
 MIN_TRANSPARENCY_PERCENT = 5.0
 
 
-def process_image(image_path):
+def process_image(image_path, desired_token_count):
 
     print("processing image", image_path)
     resize_jpg(image_path, image_path, 750)
@@ -46,7 +46,8 @@ def process_image(image_path):
     remove_background(image_path, bg_removed_path)
 
     print("drawing boxes", bg_removed_path, image_path, target_file)
-    draw_bounding_box(bg_removed_path, image_path, target_file)
+
+    draw_bounding_box(bg_removed_path, image_path, target_file, desired_token_count)
 
     # display_image('output_png', target_file)
 
@@ -68,4 +69,4 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    process_image(args.input_image)
+    process_image(args.input_image, 1)
