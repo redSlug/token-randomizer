@@ -36,7 +36,7 @@ def process_image(image_path):
     # Clean up: not needed for 1 users, but may be needed in the future
     # if os.path.exists(extracted_obj_dir):
     #     shutil.rmtree(extracted_obj_dir)
-    # os.makedirs(os.path.dirname(target_file), exist_ok=True)     # Make sure the parent directories exist
+    os.makedirs(os.path.dirname(target_file), exist_ok=True)     # Make sure the parent directories exist
 
     monitor = MemoryMonitor()
     monitor.start()

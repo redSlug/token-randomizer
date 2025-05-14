@@ -42,10 +42,12 @@ def draw_bounding_box(input_path, orig_path, output_path, min_area=100):
     for label in range(1, num_labels): # Skip background (label 0)
         x, y, w, h, area = stats[label]
         if area >= min_area:
-            # Draw rectangles on all found tokens
+            # Draw circles on all found tokens
             color = (0, 0, 0, 255) if draw_on_has_alpha else (0, 0, 255)
-            cv2.rectangle(img_to_draw_on, (x, y), (x + w, y + h), color, 2)
-            print(f"Drew all bounding boxes onto {os.path.basename(orig_path)}.")
+            center = (x + w // 2, y + h // 2)
+            radius = min(w // 2, h // 2)
+            cv2.circle(img_to_draw_on, center, radius, color, 2)
+            print(f"Drew all bounding circles onto {os.path.basename(orig_path)}.")
 
             valid_boxes.append((x, y, w, h)) # Store coordinates directly
 
@@ -57,10 +59,12 @@ def draw_bounding_box(input_path, orig_path, output_path, min_area=100):
         selected_box = random.choice(valid_boxes)
         x, y, w, h = selected_box
 
-        # Draw the selected rectangle on the img_to_draw_on
-        color = (0, 255, 255, 255) if draw_on_has_alpha else (255, 255, 255)
-        cv2.rectangle(img_to_draw_on, (x, y), (x + w, y + h), color, 2)
-        print(f"Drew 1 randomly selected bounding box onto {os.path.basename(orig_path)}.")
+        # Draw the selected circle on the img_to_draw_on
+        color = (0, 255, 255, 255) if draw_on_has_alpha else (255, 255, 255) # Changed BGR color to white for selected, was (0,0,255) red
+        center = (x + w // 2, y + h // 2)
+        radius = min(w // 2, h // 2)
+        cv2.circle(img_to_draw_on, center, radius, color, 2)
+        print(f"Drew 1 randomly selected bounding circle onto {os.path.basename(orig_path)}.")
 
     # Save the modified (or original if no box drawn) drawing image
     try:
