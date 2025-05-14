@@ -54,13 +54,13 @@ function App() {
       <div className="image-container">
         {image && (
           <div className="image-wrapper">
-            <h2>Original Token</h2>
+            <h2>Original Tokens</h2>
             <img src={image} alt="Original" />
           </div>
         )}
         {randomizedImage && (
           <div className="image-wrapper">
-            <h2>Randomized Token</h2>
+            <h2>Randomly Chosen Token(s)</h2>
             <img src={randomizedImage} alt="Randomized" />
           </div>
         )}

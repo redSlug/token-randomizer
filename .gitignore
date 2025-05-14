@@ -8,3 +8,5 @@ __pycache__/
 ext/
 .env
 frontend/node_modules/
+.DS_Store
+debug/

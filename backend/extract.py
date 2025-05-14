@@ -42,6 +42,11 @@ def draw_bounding_box(input_path, orig_path, output_path, min_area=100):
     for label in range(1, num_labels): # Skip background (label 0)
         x, y, w, h, area = stats[label]
         if area >= min_area:
+            # Draw rectangles on all found tokens
+            color = (0, 0, 0, 255) if draw_on_has_alpha else (0, 0, 255)
+            cv2.rectangle(img_to_draw_on, (x, y), (x + w, y + h), color, 2)
+            print(f"Drew all bounding boxes onto {os.path.basename(orig_path)}.")
+
             valid_boxes.append((x, y, w, h)) # Store coordinates directly
 
     if not valid_boxes:
@@ -53,7 +58,7 @@ def draw_bounding_box(input_path, orig_path, output_path, min_area=100):
         x, y, w, h = selected_box
 
         # Draw the selected rectangle on the img_to_draw_on
-        color = (0, 0, 255, 255) if draw_on_has_alpha else (0, 0, 255)
+        color = (0, 255, 255, 255) if draw_on_has_alpha else (255, 255, 255)
         cv2.rectangle(img_to_draw_on, (x, y), (x + w, y + h), color, 2)
         print(f"Drew 1 randomly selected bounding box onto {os.path.basename(orig_path)}.")
 

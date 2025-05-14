@@ -1,6 +1,6 @@
 # Token Randomizer
 
-A web application that selects a ranom token in a user provided image.
+A web application that selects a random token in a user provided image.
 
 ## Local Development
 

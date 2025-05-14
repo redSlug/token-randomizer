@@ -6,5 +6,7 @@ services:
       dockerfile: DockerfileLocal
     image:
       bdettmer/token-randomizer:latest
+    volumes:
+      - ./debug:/token-randomizer/backend/out_bg
     ports:
       - "5003:5000"
